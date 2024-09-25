@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react"
-import ReactDOM from "react-dom"
+import { createRoot } from "react-dom/client"
 import "./style.css"
-import MySVGIcon from "../public/Frame.svg"
-import Generate from "../public/generate.svg"
-import Insert from "../public/insert.svg"
-import Regenerate from "../public/regenerate.svg"
+const MySVGIcon = chrome.runtime.getURL("/Frame.svg");
+const Generate = chrome.runtime.getURL("/generate.svg");
+const Insert = chrome.runtime.getURL("/insert.svg");
+const Regenerate = chrome.runtime.getURL("/regenerate.svg");
+
 
 const LinkedInExtension: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false)
@@ -21,7 +22,6 @@ const LinkedInExtension: React.FC = () => {
       ) as HTMLElement
 
       if (messageInput) {
-        console.log("Message input found")
         messageInput.addEventListener("focus", () => showSVGIcon(messageInput))
       }
     })
@@ -41,7 +41,7 @@ const LinkedInExtension: React.FC = () => {
       svgContainer.className = "absolute right-2 bottom-1 cursor-pointer"
 
       svgContainer.innerHTML = `
-        <img src=${MySVGIcon} alt="Icon" width="32" height="32" />
+        <img src="${MySVGIcon}" alt="Icon" width="32" height="32" />
       `
       svgContainer.addEventListener("click", () => {
         setStage("prompt")
@@ -73,7 +73,6 @@ const LinkedInExtension: React.FC = () => {
     ) as HTMLDivElement
 
     if (messageInput) {
-      console.log("Messages,", messages)
       messageInput.innerHTML = `<p>${messages[1]}</p>`
       const inputEvent = new Event("input", { bubbles: true })
       messageInput.dispatchEvent(inputEvent)
@@ -209,8 +208,10 @@ const LinkedInExtension: React.FC = () => {
 export default defineContentScript({
   matches: ["*://*.linkedin.com/*"],
   main() {
-    const root = document.createElement("div")
-    document.body.appendChild(root)
-    ReactDOM.render(<LinkedInExtension />, root)
+    const rootElement = document.createElement("div")
+    document.body.appendChild(rootElement)
+
+    const root = createRoot(rootElement)
+    root.render(<LinkedInExtension />)
   },
-})
+});
